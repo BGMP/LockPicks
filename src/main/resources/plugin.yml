@@ -1,0 +1,6 @@
+name: LockPicks
+version: ${project.version}
+main: me.bgmp.lockpicks.LockPicks
+authors: [BGem]
+depend: [Vault, Essentials]
+description: A plugin featuring lockpicks and keys for doors

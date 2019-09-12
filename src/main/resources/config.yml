@@ -1,0 +1,24 @@
+lockpick:
+  material: WOOD_AXE
+  ratio: 0.25
+apartment:
+  default_price: 100
+  forRentSignPlacementTrigger: "[Rent]"
+  forRentSignContent:
+    - "[Rent]"
+    - "Price: %price%"
+    - ""
+    - ""
+  rentedSignContent:
+    - "[Rented]"
+    - "Owner: %owner%"
+    - ""
+    - ""
+  allowed_doors:
+    - "DARK_OAK_DOOR"
+    - "BIRCH_DOOR"
+    - "WOODEN_DOOR"
+    - "SPRUCE_DOOR"
+    - "JUNGLE_DOOR"
+    - "ACACIA_DOOR"
+    - "IRON_DOOR_BLOCK"
