@@ -121,6 +121,7 @@ public class PlayerInteract implements Listener {
         }
     }
 
+    // TODO: Remove this debug feature
     @EventHandler
     public void onChat(AsyncPlayerChatEvent event) {
         Player player = event.getPlayer();

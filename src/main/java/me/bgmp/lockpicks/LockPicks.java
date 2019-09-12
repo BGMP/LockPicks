@@ -80,7 +80,7 @@ public final class LockPicks extends JavaPlugin {
         apartmentDoors = new ArrayList<>();
         getApartmentDoorsRegistry = new ApartmentDoor.ApartmentDoorsRegistry(apartmentDoors);
         getApartmentDoorsRegistry.setUp();
-        getApartmentDoorsRegistry.loadApartmentsRegistry();
+        getApartmentDoorsRegistry.load();
 
         parseAllowedDoors();
 

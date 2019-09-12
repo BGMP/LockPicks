@@ -217,7 +217,7 @@ public class ApartmentDoor {
             LockPicks.getApartmentDoorsRegistry.saveRegistry();
         }
 
-        public void loadApartmentsRegistry() {
+        public void load() {
             registryFileConfiguration.getKeys(false).forEach(key -> {
                 String id = key;
 
@@ -241,7 +241,7 @@ public class ApartmentDoor {
 
                 double price = registryFileConfiguration.getDouble(key + ".price");
 
-                // Reminder to add multiple worlds support
+                // TODO: Add multiple worlds support
                 Location doorLocation = new Location(Bukkit.getWorlds().get(0), doorX, doorY, doorZ);
                 Location signLocation = new Location(Bukkit.getWorlds().get(0), signX, signY, signZ);
 
