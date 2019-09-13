@@ -14,6 +14,7 @@ public class PlayerQuit implements Listener {
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
         List<ApartmentDoor> playerApartments = LockPicks.getApartmentDoorsRegistry.getPlayerApartments(player);
+        if (playerApartments.isEmpty()) return;
         playerApartments.forEach(ApartmentDoor::evict);
     }
 }
