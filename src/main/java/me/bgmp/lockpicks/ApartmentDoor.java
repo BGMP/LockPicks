@@ -8,15 +8,18 @@ import org.bukkit.block.Sign;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.SignChangeEvent;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+
+import static me.bgmp.lockpicks.EventHandlers.PlayerInteract.evalPriceLine;
 
 public class ApartmentDoor {
     private UUID id;
@@ -111,22 +114,41 @@ public class ApartmentDoor {
         return LockPicks.getPlugin.getConfig().getDouble("apartment.default_price");
     }
 
-    public void setForRentSignContent(SignChangeEvent event, String priceLine) {
-        AtomicInteger lineCount = new AtomicInteger(signForRentContent.size() - 4);
-        signForRentContent.forEach(contentLine -> {
-            event.setLine(lineCount.get(), ChatColor.translateAlternateColorCodes('&', contentLine.replaceAll("%price%", String.valueOf(parsePrice(priceLine)))));
-            lineCount.getAndIncrement();
-        });
+
+    public void setForRentSignContent(String priceLine) {
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                AtomicInteger lineCount = new AtomicInteger(signForRentContent.size() - 4);
+                Sign signInstance = (Sign) sign.getState();
+                signForRentContent.forEach(contentLine -> {
+                    signInstance.setLine(lineCount.get(), ChatColor.translateAlternateColorCodes('&', contentLine.replaceAll("%price%", String.valueOf(parsePrice(priceLine)))));
+                    lineCount.getAndIncrement();
+                });
+                signInstance.update();
+                this.cancel();
+            }
+        }.runTaskTimer(LockPicks.getPlugin, 0L, 0L);
     }
 
     public void setRentedSignContent() {
+        Sign signInstance = (Sign) sign.getState();
         AtomicInteger lineCount = new AtomicInteger(signForRentContent.size() - 4);
         signRentedContent.forEach(contentLine -> {
-            Sign signInstance = (Sign) sign.getState();
             signInstance.setLine(lineCount.get(), ChatColor.translateAlternateColorCodes('&', contentLine.replaceAll("%owner%", owner.getDisplayName())));
             signInstance.update();
             lineCount.getAndIncrement();
         });
+        signInstance.update();
+    }
+
+    public void evict() {
+        setOwner(null);
+        setRented(false);
+        Sign signInstance = (Sign) sign.getState();
+        String priceLine = evalPriceLine(signInstance.getLines());
+        setForRentSignContent(priceLine);
+        touchRegistry();
     }
 
     public void touchRegistry() {
@@ -253,6 +275,8 @@ public class ApartmentDoor {
                 apartmentDoor.setOwner(null);
                 apartmentDoor.setRented(false);
 
+                // TODO: Update apartments sign's content upon reload.
+
                 LockPicks.getApartmentDoorsRegistry.register(apartmentDoor);
                 apartmentDoor.touchRegistry();
             });
@@ -279,6 +303,16 @@ public class ApartmentDoor {
                 }
             });
             return isRegistered.get();
+        }
+
+        public List<ApartmentDoor> getPlayerApartments(Player owner) {
+            List<ApartmentDoor> ownedApartments = new ArrayList<>();
+            apartmentDoors.forEach(apartmentDoor -> {
+                if (apartmentDoor.getOwner().getName().equals(owner.getName())) {
+                    ownedApartments.add(apartmentDoor);
+                }
+            });
+            return ownedApartments;
         }
     }
 }

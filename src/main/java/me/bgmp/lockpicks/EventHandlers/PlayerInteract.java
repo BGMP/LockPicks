@@ -3,10 +3,7 @@ package me.bgmp.lockpicks.EventHandlers;
 import me.bgmp.lockpicks.ApartmentDoor;
 import me.bgmp.lockpicks.LockPicks;
 import me.bgmp.lockpicks.Utils.ChatConstant;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -32,13 +29,11 @@ public class PlayerInteract implements Listener {
         return LockPicks.getPlugin.getConfig().getDouble("apartment.default_price");
     }
 
-    @EventHandler
-    public void onRentSignPlace(SignChangeEvent event) {
-        Player player = event.getPlayer();
-        String line0 = event.getLine(0);
-        String line1 = event.getLine(1);
-        String line2 = event.getLine(2);
-        String line3 = event.getLine(3);
+    public static String evalPriceLine(String[] signLines) {
+        String line0 = signLines[0];
+        String line1 = signLines[1];
+        String line2 = signLines[2];
+        String line3 = signLines[3];
         String priceLine = "0";
 
         AtomicInteger lineCount = new AtomicInteger();
@@ -56,10 +51,21 @@ public class PlayerInteract implements Listener {
         else if (priceLineIndex.get() == 2) priceLine = line2;
         else if (priceLineIndex.get() == 3) priceLine = line3;
 
+        return priceLine;
+    }
+
+    @EventHandler
+    public void onRentSignPlace(SignChangeEvent event) {
+        Player player = event.getPlayer();
+        String line0 = event.getLine(0);
+        String priceLine = evalPriceLine(event.getLines());
+
         if (!player.hasPermission("lockpicks.apartments.create")) return;
         if (line0.equals(LockPicks.getPlugin.getConfig().getString("apartment.forRentSignPlacementTrigger"))) {
             if (!player.hasPermission("lockpicks.apartment.create")) return;
             Block signBlock = event.getBlock();
+
+            org.bukkit.block.Sign castedSign = (org.bukkit.block.Sign) signBlock.getState();
             Sign sign = (Sign) signBlock.getState().getData();
 
             Block attachedBlock = signBlock.getRelative(sign.getAttachedFace());
@@ -70,9 +76,9 @@ public class PlayerInteract implements Listener {
 
             Material bellowAttachedBlockMaterial = bellowAttachedBlock.getType();
             if (LockPicks.getAllowedDoors.contains(bellowAttachedBlockMaterial)) {
-                ApartmentDoor apartmentDoor = new ApartmentDoor(UUID.randomUUID(), bellowAttachedBlock, signBlock, parsePrice(line1));
+                ApartmentDoor apartmentDoor = new ApartmentDoor(UUID.randomUUID(), bellowAttachedBlock, signBlock, parsePrice(priceLine));
                 apartmentDoor.touchRegistry();
-                apartmentDoor.setForRentSignContent(event, priceLine);
+                apartmentDoor.setForRentSignContent(priceLine);
                 player.sendMessage(ChatConstant.CREATED_APARTMENT.formatAsSuccess() + ChatColor.WHITE + " @ " + ChatColor.AQUA + signBlock.getX() + ChatColor.WHITE +  "," + ChatColor.AQUA + signBlock.getY() + ChatColor.WHITE + "," + ChatColor.AQUA + signBlock.getZ());
             }
         }
