@@ -29,7 +29,7 @@ public class PlayerInteract implements Listener {
         return LockPicks.getPlugin.getConfig().getDouble("apartment.default_price");
     }
 
-    public static String evalPriceLine(String[] signLines) {
+    private String evalPriceLine(String[] signLines) {
         String line0 = signLines[0];
         String line1 = signLines[1];
         String line2 = signLines[2];
@@ -64,8 +64,6 @@ public class PlayerInteract implements Listener {
         if (line0.equals(LockPicks.getPlugin.getConfig().getString("apartment.forRentSignPlacementTrigger"))) {
             if (!player.hasPermission("lockpicks.apartment.create")) return;
             Block signBlock = event.getBlock();
-
-            org.bukkit.block.Sign castedSign = (org.bukkit.block.Sign) signBlock.getState();
             Sign sign = (Sign) signBlock.getState().getData();
 
             Block attachedBlock = signBlock.getRelative(sign.getAttachedFace());
@@ -78,7 +76,7 @@ public class PlayerInteract implements Listener {
             if (LockPicks.getAllowedDoors.contains(bellowAttachedBlockMaterial)) {
                 ApartmentDoor apartmentDoor = new ApartmentDoor(UUID.randomUUID(), bellowAttachedBlock, signBlock, parsePrice(priceLine));
                 apartmentDoor.touchRegistry();
-                apartmentDoor.setForRentSignContent(priceLine);
+                apartmentDoor.setForRentSignContent();
                 player.sendMessage(ChatConstant.CREATED_APARTMENT.formatAsSuccess() + ChatColor.WHITE + " @ " + ChatColor.AQUA + signBlock.getX() + ChatColor.WHITE +  "," + ChatColor.AQUA + signBlock.getY() + ChatColor.WHITE + "," + ChatColor.AQUA + signBlock.getZ());
             }
         }

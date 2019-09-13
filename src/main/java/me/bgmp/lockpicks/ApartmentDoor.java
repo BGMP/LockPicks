@@ -19,8 +19,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static me.bgmp.lockpicks.EventHandlers.PlayerInteract.evalPriceLine;
-
 public class ApartmentDoor {
     private UUID id;
     private Player owner = null;
@@ -106,23 +104,14 @@ public class ApartmentDoor {
         return LockPicks.getApartmentDoorsRegistry.getApartmentBySignLocation(signLocation) != null;
     }
 
-    private double parsePrice(String priceLine) {
-        try {
-            return Double.parseDouble(priceLine);
-        } catch (NumberFormatException ignore) {
-        }
-        return LockPicks.getPlugin.getConfig().getDouble("apartment.default_price");
-    }
-
-
-    public void setForRentSignContent(String priceLine) {
+    public void setForRentSignContent() {
         new BukkitRunnable() {
             @Override
             public void run() {
                 AtomicInteger lineCount = new AtomicInteger(signForRentContent.size() - 4);
                 Sign signInstance = (Sign) sign.getState();
                 signForRentContent.forEach(contentLine -> {
-                    signInstance.setLine(lineCount.get(), ChatColor.translateAlternateColorCodes('&', contentLine.replaceAll("%price%", String.valueOf(parsePrice(priceLine)))));
+                    signInstance.setLine(lineCount.get(), ChatColor.translateAlternateColorCodes('&', contentLine.replaceAll("%price%", String.valueOf(price))));
                     lineCount.getAndIncrement();
                 });
                 signInstance.update();
@@ -145,9 +134,7 @@ public class ApartmentDoor {
     public void evict() {
         setOwner(null);
         setRented(false);
-        Sign signInstance = (Sign) sign.getState();
-        String priceLine = evalPriceLine(signInstance.getLines());
-        setForRentSignContent(priceLine);
+        setForRentSignContent();
         touchRegistry();
     }
 
@@ -307,7 +294,7 @@ public class ApartmentDoor {
 
         public List<ApartmentDoor> getPlayerApartments(Player owner) {
             List<ApartmentDoor> ownedApartments = new ArrayList<>();
-            apartmentDoors.forEach(apartmentDoor -> {
+            LockPicks.getApartmentDoorsRegistry.getApartmentDoors().forEach(apartmentDoor -> {
                 if (apartmentDoor.getOwner().getName().equals(owner.getName())) {
                     ownedApartments.add(apartmentDoor);
                 }
