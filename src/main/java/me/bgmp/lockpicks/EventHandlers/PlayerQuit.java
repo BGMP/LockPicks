@@ -13,8 +13,10 @@ public class PlayerQuit implements Listener {
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
-        List<ApartmentDoor> playerApartments = LockPicks.getApartmentDoorsRegistry.getPlayerApartments(player);
-        if (playerApartments.isEmpty()) return;
-        playerApartments.forEach(ApartmentDoor::evict);
+        if (LockPicks.getPlugin.getConfig().getBoolean("apartment.auto-evict")) {
+            List<ApartmentDoor> playerApartments = LockPicks.getApartmentDoorsRegistry.getPlayerApartments(player);
+            if (playerApartments.isEmpty()) return;
+            playerApartments.forEach(ApartmentDoor::evict);
+        }
     }
 }

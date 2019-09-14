@@ -3,7 +3,9 @@ package me.bgmp.lockpicks;
 import com.sk89q.bukkit.util.BukkitCommandsManager;
 import com.sk89q.bukkit.util.CommandsManagerRegistration;
 import com.sk89q.minecraft.util.commands.*;
-import me.bgmp.lockpicks.EventHandlers.PlayerInteract;
+import me.bgmp.lockpicks.Commands.LockPickCommand;
+import me.bgmp.lockpicks.EventHandlers.PlayerDoorInteract;
+import me.bgmp.lockpicks.EventHandlers.PlayerSignInteract;
 import me.bgmp.lockpicks.EventHandlers.PlayerQuit;
 import me.bgmp.lockpicks.Utils.ChatConstant;
 import net.milkbowl.vault.economy.Economy;
@@ -11,12 +13,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,6 +25,7 @@ public final class LockPicks extends JavaPlugin {
     public static ApartmentDoor.ApartmentDoorsRegistry getApartmentDoorsRegistry;
     public static List<ApartmentDoor> apartmentDoors;
     public static List<Material> getAllowedDoors;
+    public static List<String> getAllowedDoorStrings;
     public static Economy getEconomy;
 
     private CommandsManager commands;
@@ -65,22 +65,22 @@ public final class LockPicks extends JavaPlugin {
     @Override
     public void onEnable() {
         getPlugin = this;
-
         if (!setupEconomy()) {
             Bukkit.shutdown();
         }
 
         loadConfiguration();
 
-        getLockPickParams = new LockPick(
-                parseConfiguredMaterial(),
-                getConfig().getDouble("lockpick.ratio")
-        );
-
         apartmentDoors = new ArrayList<>();
         getApartmentDoorsRegistry = new ApartmentDoor.ApartmentDoorsRegistry(apartmentDoors);
         getApartmentDoorsRegistry.setUp();
         getApartmentDoorsRegistry.load();
+
+        if (getConfig().getBoolean("apartment.auto-evict")) {
+            getApartmentDoorsRegistry.getApartmentDoors().forEach(ApartmentDoor::evict);
+        }
+
+        getLockPickParams = new LockPick();
 
         parseAllowedDoors();
 
@@ -89,6 +89,8 @@ public final class LockPicks extends JavaPlugin {
 
         registerCommands();
         registerEvents();
+
+
     }
 
     @Override
@@ -96,11 +98,14 @@ public final class LockPicks extends JavaPlugin {
     }
 
     private void registerCommands() {
+        commandRegistry.register(LockPickCommand.LockPickParentCommand.class);
+        commandRegistry.register(LockPickCommand.class);
     }
 
     private void registerEvents() {
-        Bukkit.getPluginManager().registerEvents(new PlayerInteract(), this);
+        Bukkit.getPluginManager().registerEvents(new PlayerSignInteract(), this);
         Bukkit.getPluginManager().registerEvents(new PlayerQuit(), this);
+        Bukkit.getPluginManager().registerEvents(new PlayerDoorInteract(), this);
     }
 
     private void loadConfiguration() {
@@ -108,13 +113,15 @@ public final class LockPicks extends JavaPlugin {
         saveConfig();
     }
 
-    private Material parseConfiguredMaterial() {
-        return Material.getMaterial(getConfig().getString("lockpick.material").toUpperCase());
-    }
-
     private void parseAllowedDoors() {
         getAllowedDoors = new ArrayList<>();
+        getAllowedDoorStrings = new ArrayList<>();
+
         List<String> doors = getPlugin.getConfig().getStringList("apartment.allowed_doors");
-        doors.forEach(door -> getAllowedDoors.add(Material.getMaterial(door.toUpperCase())));
+        doors.forEach(door -> {
+            String uppedDoor = door.toUpperCase();
+            getAllowedDoorStrings.add(uppedDoor);
+            getAllowedDoors.add(Material.getMaterial(uppedDoor));
+        });
     }
 }

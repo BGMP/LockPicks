@@ -1,7 +1,23 @@
 lockpick:
-  material: WOOD_AXE
+  item:
+    material: WOOD_AXE
+    name: "LockPick"
+    lore:
+      - "The lockpick o:"
   ratio: 0.25
+  damage: 2.0
+  successMessage: "&aYou've cracked the door open!"
+  failMessage: "&cYour cracking attempt has failed!"
+  crackSound:
+    effect: "ENTITY_ITEM_PICKUP"
+    v: 1
+    v1: 1
+  damageSound:
+    effect: "BLOCK_ANVIL_HIT"
+    v: 1
+    v1: 1
 apartment:
+  auto-evict: true
   default_price: 100
   forRentSignPlacementTrigger: "[Rent]"
   forRentSignContent:

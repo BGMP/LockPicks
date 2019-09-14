@@ -3,6 +3,7 @@ package me.bgmp.lockpicks.EventHandlers;
 import me.bgmp.lockpicks.ApartmentDoor;
 import me.bgmp.lockpicks.LockPicks;
 import me.bgmp.lockpicks.Utils.ChatConstant;
+import me.bgmp.lockpicks.Utils.Permission;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -10,6 +11,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -19,7 +21,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class PlayerInteract implements Listener {
+public class PlayerSignInteract implements Listener {
 
     private double parsePrice(String line1) {
         try {
@@ -60,9 +62,8 @@ public class PlayerInteract implements Listener {
         String line0 = event.getLine(0);
         String priceLine = evalPriceLine(event.getLines());
 
-        if (!player.hasPermission("lockpicks.apartments.create")) return;
+        if (!player.hasPermission(Permission.APARTMENT_CREATE.getNode())) return;
         if (line0.equals(LockPicks.getPlugin.getConfig().getString("apartment.forRentSignPlacementTrigger"))) {
-            if (!player.hasPermission("lockpicks.apartment.create")) return;
             Block signBlock = event.getBlock();
             Sign sign = (Sign) signBlock.getState().getData();
 
@@ -83,15 +84,19 @@ public class PlayerInteract implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGH)
-    public void onRentSignLeftClick(PlayerInteractEvent event) {
+    public void onRentSignBreak(BlockBreakEvent event) {
         Player player = event.getPlayer();
-        if (!player.hasPermission("lockpicks.apartments.destroy")) return;
-        if (event.getAction() != Action.LEFT_CLICK_BLOCK) return;
-        if (event.getClickedBlock().getState() instanceof org.bukkit.block.Sign) {
-            Block signBlock = event.getClickedBlock();
+        Block block = event.getBlock();
+        if (!player.hasPermission(Permission.APARTMENT_DESTROY.getNode())) return;
+        if (block.getType() != Material.WALL_SIGN) {
+            LockPicks.getApartmentDoorsRegistry.getApartmentDoors().forEach(apartmentDoor -> {
+                if (apartmentDoor.isSignAttachment(block)) event.setCancelled(true);
+            });
+        } else if (block.getState() instanceof org.bukkit.block.Sign) {
+            Block signBlock = event.getBlock();
             Location clickedSignLocation = signBlock.getLocation();
             if (!ApartmentDoor.isApartmentDoor(clickedSignLocation)) return;
-            Location signLocation = event.getClickedBlock().getLocation();
+            Location signLocation = event.getBlock().getLocation();
             ApartmentDoor apartmentDoor = LockPicks.getApartmentDoorsRegistry.getApartmentBySignLocation(signLocation);
             LockPicks.getApartmentDoorsRegistry.unregister(apartmentDoor);
             player.sendMessage(ChatConstant.DESTROYED_APARTMENT.formatAsSuccess() + ChatColor.WHITE + " @ " + ChatColor.AQUA + signBlock.getX() + ChatColor.WHITE +  "," + ChatColor.AQUA + signBlock.getY() + ChatColor.WHITE + "," + ChatColor.AQUA + signBlock.getZ());
@@ -101,7 +106,7 @@ public class PlayerInteract implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onRentSignRightClick(PlayerInteractEvent event) {
         Player player = event.getPlayer();
-        if (!player.hasPermission("lockpicks.apartments.purchase")) return;
+        if (!player.hasPermission(Permission.APARTMENT_RENT.getNode())) return;
         if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
         if (event.getClickedBlock().getState() instanceof org.bukkit.block.Sign) {
             Location clickedSignLocation = event.getClickedBlock().getLocation();
@@ -123,12 +128,5 @@ public class PlayerInteract implements Listener {
                 player.sendMessage(ChatConstant.NOT_ENOUGH_MONEY.formatAsException());
             }
         }
-    }
-
-    // TODO: Remove this debug feature
-    @EventHandler
-    public void onChat(AsyncPlayerChatEvent event) {
-        Player player = event.getPlayer();
-        player.sendMessage(LockPicks.getApartmentDoorsRegistry.getApartmentDoors().toString());
     }
 }

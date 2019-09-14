@@ -104,6 +104,16 @@ public class ApartmentDoor {
         return LockPicks.getApartmentDoorsRegistry.getApartmentBySignLocation(signLocation) != null;
     }
 
+    public boolean isSignAttachment(Block block) {
+        org.bukkit.material.Sign signMaterial = (org.bukkit.material.Sign) sign.getState().getData();
+        Block signAttachment = sign.getRelative(signMaterial.getAttachedFace());
+
+        String blockLocationString = block.getLocation().toString();
+        String signAttachmentLocationString = signAttachment.getLocation().toString();
+
+        return blockLocationString.equals(signAttachmentLocationString);
+    }
+
     public void setForRentSignContent() {
         new BukkitRunnable() {
             @Override
@@ -280,6 +290,17 @@ public class ApartmentDoor {
             return apartmentDoorMatch.get();
         }
 
+        public ApartmentDoor getApartmentByDoorLocation(Location doorLocationToCompare) {
+            AtomicReference<ApartmentDoor> apartmentDoorMatch = new AtomicReference<>();
+            LockPicks.getApartmentDoorsRegistry.getApartmentDoors().forEach(apartmentDoor -> {
+                // Apparently Locations can't be ==? yet turning them into Strings seems to do the trick
+                if (apartmentDoor.getDoor().getLocation().toString().equals(doorLocationToCompare.toString())) {
+                    apartmentDoorMatch.set(apartmentDoor);
+                }
+            });
+            return apartmentDoorMatch.get();
+        }
+
         public boolean doorIsRegistered(Block door) {
             AtomicBoolean isRegistered = new AtomicBoolean(false);
             String inputDoor = door.toString();
@@ -295,8 +316,10 @@ public class ApartmentDoor {
         public List<ApartmentDoor> getPlayerApartments(Player owner) {
             List<ApartmentDoor> ownedApartments = new ArrayList<>();
             LockPicks.getApartmentDoorsRegistry.getApartmentDoors().forEach(apartmentDoor -> {
-                if (apartmentDoor.getOwner().getName().equals(owner.getName())) {
-                    ownedApartments.add(apartmentDoor);
+                if (apartmentDoor.getOwner() != null) {
+                    if (apartmentDoor.getOwner().getName().equals(owner.getName())) {
+                        ownedApartments.add(apartmentDoor);
+                    }
                 }
             });
             return ownedApartments;
