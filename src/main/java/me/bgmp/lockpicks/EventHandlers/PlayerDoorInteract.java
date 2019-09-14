@@ -90,7 +90,7 @@ public class PlayerDoorInteract implements Listener {
                                  event.setCancelled(true);
                                  player.damage(LockPicks.getLockPickParams.getDamage());
                                  player.sendMessage(LockPicks.getLockPickParams.getOnDamageMessage());
-                                 player.playSound(playerLocation, lockpick.getDamageSound(), lockpick.getCrackSoundv(), lockpick.getCrackSoundv1());
+                                 player.playSound(playerLocation, lockpick.getDamageSound(), lockpick.getDamageSoundv(), lockpick.getDamageSoundv1());
                              }
                          }
                      }
