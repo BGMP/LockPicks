@@ -36,12 +36,12 @@ public class PlayerDoorInteract implements Listener {
         if (action != Action.RIGHT_CLICK_BLOCK && action != Action.LEFT_CLICK_BLOCK) return;
 
         Block clickedBlock = event.getClickedBlock();
-         if (!LockPicks.getAllowedDoorStrings.contains(clickedBlock.getType().toString())) return;
+        if (!LockPicks.getAllowedDoorStrings.contains(clickedBlock.getType().toString())) return;
 
-         LockPick lockpick = LockPicks.getLockPickParams;
+        LockPick lockpick = LockPicks.getLockPickParams;
 
-         ItemStack itemInHand = player.getInventory().getItemInMainHand();
-         ItemMeta itemInHandMeta = itemInHand.getItemMeta();
+        ItemStack itemInHand = player.getInventory().getItemInMainHand();
+        ItemMeta itemInHandMeta = itemInHand.getItemMeta();
 
         Location clickedBlockLocation;
         Door clickedDoor = (Door) clickedBlock.getState().getData();
@@ -82,6 +82,7 @@ public class PlayerDoorInteract implements Listener {
                              if (new Random().nextDouble() <= successRatio) {
                                  player.sendMessage(lockpick.getOnDoorCrackMessage());
                                  player.playSound(playerLocation, lockpick.getCrackSound(), lockpick.getCrackSoundv(), lockpick.getCrackSoundv1());
+                                 owner.playSound(playerLocation, lockpick.getDamageSound(), lockpick.getDamageSoundv(), lockpick.getDamageSoundv1());
                                  event.setCancelled(false);
                                  openAnyDoor(action, clickedBlock);
                                  return;
