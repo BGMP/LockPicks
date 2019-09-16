@@ -134,7 +134,7 @@ public class ApartmentDoor {
         Sign signInstance = (Sign) sign.getState();
         AtomicInteger lineCount = new AtomicInteger(signForRentContent.size() - 4);
         signRentedContent.forEach(contentLine -> {
-            signInstance.setLine(lineCount.get(), ChatColor.translateAlternateColorCodes('&', contentLine.replaceAll("%owner%", owner.getDisplayName())));
+            signInstance.setLine(lineCount.get(), ChatColor.translateAlternateColorCodes('&', contentLine.replaceAll("%owner%", owner.getName())));
             signInstance.update();
             lineCount.getAndIncrement();
         });
