@@ -105,7 +105,6 @@ public class PlayerSignInteract implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onRentSignRightClick(PlayerInteractEvent event) {
         Player player = event.getPlayer();
-        if (!player.hasPermission(Permission.APARTMENT_RENT.getNode())) return;
         if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
         if (event.getClickedBlock().getState() instanceof org.bukkit.block.Sign) {
             Location clickedSignLocation = event.getClickedBlock().getLocation();

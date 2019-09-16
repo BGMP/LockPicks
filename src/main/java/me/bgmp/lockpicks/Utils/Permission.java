@@ -3,8 +3,7 @@ package me.bgmp.lockpicks.Utils;
 public enum Permission {
     APARTMENTS_OVERRIDE("lockpicks.apartments.override", "Overrides access to apartments, providing full permissions over them."),
     APARTMENT_CREATE("lockpicks.apartments.create", "Allows access to create apartment doors."),
-    APARTMENT_DESTROY("lockpicks.apartments.destroy", "Allows access to destroy existing apartment doors."),
-    APARTMENT_RENT("lockpicks.apartments.rent", "Allows access to rent apartment doors.");
+    APARTMENT_DESTROY("lockpicks.apartments.destroy", "Allows access to destroy existing apartment doors.");
 
     private String node;
     private String description;
