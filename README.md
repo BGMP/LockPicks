@@ -41,14 +41,14 @@ Now for the second part of the configuration:
 
 Here everything should be pretty self explainatory as well, but I'll take the freedom to elaborate on some of them and illustrate some others:
 
-  * `auto-evict`: Sets player apartments back to a "for rent" state when players disconnect from the server if set to *true*.
+  * `auto-evict`: Sets player apartments back to the "for rent" state when players disconnect from the server if set to *true*.
 
-The `forRentSignPlacementTrigger` field is used for the server to recognize when a sign is meant to be an apartment door, and in order to accomplish that it does a couple of things: 
+The `forRentSignPlacementTrigger` field is used by the plugin to recognize when a sign is meant to be an apartment door, and in order to accomplish that it does a couple of things: 
   
   1. Checks if the player placing the sign has permission to create apartment doors. (lockpicks.apartment.create)
   2. Checks if the block bellow is a door (as you can see on the introduction image).
 
-Finally, given that configuration, the plugin will check if the first line of the sign contains "[Rent]", for it to be valid. The plugin will at the same time set the price to whatever follows the first line, like this:
+Finally, this configuration given, the plugin will check if the first line of the sign contains "[Rent]", for it to be valid. The plugin will at the same time set the price to whatever follows the first line, like this:
 
 <img src="https://i.imgur.com/dKEbs9T.png"/>
 
