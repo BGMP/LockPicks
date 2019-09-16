@@ -89,8 +89,6 @@ public final class LockPicks extends JavaPlugin {
 
         registerCommands();
         registerEvents();
-
-
     }
 
     @Override

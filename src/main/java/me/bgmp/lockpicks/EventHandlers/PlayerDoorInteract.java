@@ -8,6 +8,7 @@ import me.bgmp.lockpicks.Utils.Permission;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
@@ -82,14 +83,18 @@ public class PlayerDoorInteract implements Listener {
                              if (new Random().nextDouble() <= successRatio) {
                                  player.sendMessage(lockpick.getOnDoorCrackMessage());
                                  player.playSound(playerLocation, lockpick.getCrackSound(), lockpick.getCrackSoundv(), lockpick.getCrackSoundv1());
-                                 owner.playSound(playerLocation, lockpick.getDamageSound(), lockpick.getDamageSoundv(), lockpick.getDamageSoundv1());
                                  event.setCancelled(false);
                                  openAnyDoor(action, clickedBlock);
+
+                                 // Hard coded it, but should be configurable:
+                                 owner.playSound(playerLocation, Sound.ENTITY_VILLAGER_DEATH, 1, 1);
+
                                  return;
                              } else {
                                  event.setCancelled(true);
                                  player.sendMessage(LockPicks.getLockPickParams.getOnDamageMessage());
                                  player.playSound(playerLocation, lockpick.getDamageSound(), lockpick.getDamageSoundv(), lockpick.getDamageSoundv1());
+                                 owner.playSound(playerLocation, lockpick.getDamageSound(), lockpick.getDamageSoundv(), lockpick.getDamageSoundv1());
                                  player.damage(LockPicks.getLockPickParams.getDamage());
                              }
                          }
