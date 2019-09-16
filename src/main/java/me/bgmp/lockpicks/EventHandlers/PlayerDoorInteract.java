@@ -15,7 +15,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -88,9 +87,9 @@ public class PlayerDoorInteract implements Listener {
                                  return;
                              } else {
                                  event.setCancelled(true);
-                                 player.damage(LockPicks.getLockPickParams.getDamage());
                                  player.sendMessage(LockPicks.getLockPickParams.getOnDamageMessage());
                                  player.playSound(playerLocation, lockpick.getDamageSound(), lockpick.getDamageSoundv(), lockpick.getDamageSoundv1());
+                                 player.damage(LockPicks.getLockPickParams.getDamage());
                              }
                          }
                      }
