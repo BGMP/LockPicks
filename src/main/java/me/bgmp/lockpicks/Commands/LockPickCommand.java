@@ -14,7 +14,7 @@ import org.bukkit.inventory.ItemStack;
 public class LockPickCommand {
     @Command(
             aliases = {"generate"},
-            desc = "LockPick parent command."
+            desc = "Gives the command sender a lockpick."
     )
     @CommandPermissions("lockpicks.generate")
     public static void generate(final CommandContext args, final CommandSender sender) throws CommandException {
